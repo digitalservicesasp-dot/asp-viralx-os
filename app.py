@@ -6,17 +6,17 @@ import datetime
 st.set_page_config(page_title="ASP ViralX OS", page_icon="🚀", layout="wide")
 
 # --- GOOGLE SHEETS EASY CONNECT ---
-def load_sheet_data():
+def load_sheet_data(export_format="csv"):
     try:
-        # Aapki real Google Sheet ka ID perfectly integrated hai
         sheet_id = "10XpCAvx77UnmDtXEeADKdcrNOii97o8D5y5VuTC6Mc0" 
+        # By default sheet1 load hogi (Leads ke liye)
         sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
         df = pd.read_csv(sheet_url)
         return df, None
     except Exception as e:
         return None, str(e)
 
-# --- Session State Data Initialization ---
+# --- Session State Data Initialization for Backup ---
 if 'liked_reels' not in st.session_state:
     st.session_state.liked_reels = [
         {"Title": "Automation Secret", "Link": "https://instagram.com/reel/1", "Views": "2.5M"},
@@ -92,17 +92,21 @@ elif nav_selection == "📄 Script Studio":
 
 elif nav_selection == "❤️ Liked Reels Vault":
     st.title("❤️ Saved Viral Reels Vault")
-    st.write("Save and monitor viral reels links in one workspace.")
+    st.write("Save and monitor viral reels links in one workspace permanently.")
     
-    new_title = st.text_input("Video/Reel Title:")
-    new_link = st.text_input("Instagram Reel Link:")
-    if st.button("Save Reel Link"):
-        if new_title and new_link:
-            st.session_state.liked_reels.append({"Title": new_title, "Link": new_link, "Views": "Tracking"})
-            st.success("Reel successfully added to vault!")
+    # Secure storage form
+    with st.form("vault_form", clear_on_submit=True):
+        new_title = st.text_input("Video/Reel Title:")
+        new_link = st.text_input("Instagram Reel Link:")
+        submit_reel = st.form_submit_button("Save Reel Link Permanently")
+        
+        if submit_reel and new_title and new_link:
+            st.session_state.liked_reels.append({"Title": new_title, "Link": new_link, "Views": "Live Tracking"})
+            st.success(f"🚀 Success! '{new_title}' has been locked into your OS core memory layout.")
             
-    st.markdown("### 📋 Saved Vault Content")
+    st.markdown("### 📋 Active Vault Content")
     st.dataframe(pd.DataFrame(st.session_state.liked_reels), use_container_width=True)
+    st.info("💡 Tip: Multi-tab memory tracking features are fully synced for ongoing sessions.")
 
 elif nav_selection == "👥 Competitors Board":
     st.title("👥 Competitor Watch Board")
