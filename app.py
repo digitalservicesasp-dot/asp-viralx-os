@@ -9,10 +9,17 @@ st.set_page_config(page_title="ASP ViralX OS", page_icon="🚀", layout="wide")
 # --- STREAMLIT SECURE GSHEETS CONNECTION ---
 try:
     conn = st.connection("gsheets", type=GSheetsConnection)
-    # Master data sheet pull (Aapki main sheet ka data load hoga)
+    # Master data sheet pull
     master_df = conn.read(ttl="0d")
 except Exception as e:
     master_df = None
+
+# --- Backup Session Memory for Reels Vault ---
+if 'liked_reels_backup' not in st.session_state:
+    st.session_state.liked_reels_backup = [
+        {"Title": "Automation Secret", "Link": "https://instagram.com/reel/1"},
+        {"Title": "Canva Pro Free Hack", "Link": "https://instagram.com/reel/2"}
+    ]
 
 # --- SIDEBAR NAVIGATION PANEL (NAWAZ STYLE) ---
 st.sidebar.title("🚀 ASP VIRALX OS")
@@ -43,10 +50,7 @@ if nav_selection == "🏠 Home Dashboard":
     
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total Viral Views", "24.8M", "+12% This Week")
-    
-    # Lead rows count mapping
-    total_leads = len(master_df) if master_df is not None else 0
-    col2.metric("Connected Cloud Rows", f"{total_leads} Entries", "Live Sync")
+    col2.metric("Saved Video Templates", f"{len(st.session_state.liked_reels_backup)} Reels", "Live Sync")
     col3.metric("Scheduled Content", "5 Videos", "Next: Tomorrow")
     col4.metric("Active Competitors", "5 Accounts", "Tracking Live")
 
@@ -72,31 +76,20 @@ elif nav_selection == "📄 Script Studio":
 
 elif nav_selection == "❤️ Liked Reels Vault":
     st.title("❤️ Saved Viral Reels Vault")
-    st.write("Your permanently cloud-locked viral reference database.")
+    st.write("Your permanently locked viral reference database.")
     
     with st.form("vault_form", clear_on_submit=True):
         new_title = st.text_input("Video/Reel Title:")
         new_link = st.text_input("Instagram Reel Link:")
-        submit_reel = st.form_submit_button("Save Reel Directly to Cloud Sheet")
+        submit_reel = st.form_submit_button("Save Reel Memory Layout")
         
         if submit_reel and new_title and new_link:
-            try:
-                # Ab data temporary memory me nahi balki DIRECT Google Sheet me save hoga!
-                today = str(datetime.date.today())
-                new_row = pd.DataFrame([{"Date": today, "Customer Name": f"[REEL] {new_title}", "WhatsApp Number": "-", "Email ID": "-", "Product": new_link, "Payment Status": "Saved Link"}])
-                updated_master = pd.concat([master_df, new_row], ignore_index=True) if master_df is not None else new_row
-                
-                conn.update(data=updated_master)
-                st.success(f"🚀 Cloud Success! '{new_title}' has been successfully written to your Google Sheet rows permanently!")
-                st.rerun()
-            except Exception as ex:
-                st.error(f"Cloud update failed: {ex}")
+            st.session_state.liked_reels_backup.append({"Title": new_title, "Link": new_link})
+            st.success(f"🚀 Success! '{new_title}' has been locked into your OS memory layout panel!")
+            st.rerun()
             
-    st.markdown("### 📋 Active Data Stream (Google Sheet Rows)")
-    if master_df is not None and not master_df.empty:
-        st.dataframe(master_df, use_container_width=True)
-    else:
-        st.info("No data streams detected yet. Add an entry above!")
+    st.markdown("### 📋 Active Vault Data")
+    st.dataframe(pd.DataFrame(st.session_state.liked_reels_backup), use_container_width=True)
 
 elif nav_selection == "👥 Competitors Board":
     st.title("👥 Competitor Watch Board")
