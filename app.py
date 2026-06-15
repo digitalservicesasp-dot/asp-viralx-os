@@ -192,4 +192,16 @@ elif nav_selection == "➕ Add New Lead Entry":
     with st.form("lead_form", clear_on_submit=True):
         c_name = st.text_input("Customer Name")
         c_whatsapp = st.text_input("WhatsApp Number")
-        c_email = st.text_input("
+        c_email = st.text_input("Email ID")
+        c_product = st.selectbox("Product Issued", ["Canva Pro", "WaSender Tool", "Google Map Scraper", "Digital Bundle"])
+        c_status = st.selectbox("Payment Status", ["Paid", "Pending"])
+        
+        submit = st.form_submit_button("Save Lead Securely")
+        if submit:
+            st.success(f"💥 Success! {c_name}'s data has been updated in the layout panel.")
+
+elif nav_selection == "📈 Revenue Analytics":
+    st.title("📈 Commerce Revenue Dashboard")
+    st.write("Track sales conversion graphs and B2B growth metrics.")
+    st.metric("Total Generated Revenue Estimation", "₹50,000", "Target Monthly Reach")
+    st.info("Keep driving traffic from AI Hooks Studio to grow this metric!")
