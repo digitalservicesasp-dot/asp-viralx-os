@@ -12,7 +12,6 @@ st.set_page_config(page_title="ASP ViralX OS", page_icon="🚀", layout="wide")
 def connect_to_sheets():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     try:
-        # Fetch data from secrets securely
         creds_dict = json.loads(st.secrets["gcloud_service_account"])
         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
         client = gspread.authorize(creds)
@@ -36,26 +35,33 @@ if 'calendar_events' not in st.session_state:
         {"Date": "2026-06-18", "Platform": "YouTube Shorts", "Topic": "Canva Pro Mastery", "Status": "Draft"}
     ]
 
-# --- SIDEBAR NAVIGATION PANEL ---
+# --- SIDEBAR NAVIGATION PANEL (NAWAZ STYLE) ---
 st.sidebar.title("🚀 ASP VIRALX OS")
-st.sidebar.subheader("Main Systems")
+st.sidebar.markdown("---")
+
+# Main System Selector (Nawaz Style Parent Menu)
+main_system = st.sidebar.selectbox("SELECT SYSTEM:", ["🟢 VIRALITY OS (Content)", "🛒 COMMERCE OS (Sales & Leads)"])
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("**🟢 VIRALITY OS (Content)**")
-nav_selection = st.sidebar.radio(
-    "Go To:",
-    ["🏠 Home", "📄 Script Studio", "❤️ Liked Reels", "👥 Competitors", "📊 Analytics", "📅 Calendar", "✍️ AI Hooks Studio", "🎬 AI Editor Helper", "👤 Profile Panel"]
-)
 
-st.sidebar.markdown("---")
-st.sidebar.markdown("**🛒 COMMERCE OS (Sales)**")
-if st.sidebar.button("📊 Manage Leads Database"):
-    nav_selection = "🛒 Commerce OS"
+# Sub-Tabs routing based on Parent selection
+if main_system == "🟢 VIRALITY OS (Content)":
+    st.sidebar.subheader("🎥 Content Modules")
+    nav_selection = st.sidebar.radio(
+        "Go To:",
+        ["🏠 Home Dashboard", "📄 Script Studio", "❤️ Liked Reels Vault", "👥 Competitors Board", "📊 Content Analytics", "📅 Posting Calendar", "✍️ AI Hooks Studio", "🎬 AI Editor Helper", "👤 Profile Panel"]
+    )
+else:
+    st.sidebar.subheader("💼 Commerce Modules")
+    nav_selection = st.sidebar.radio(
+        "Go To:",
+        ["📊 Sales Dashboard & Live Leads", "➕ Add New Lead Entry", "📈 Revenue Analytics"]
+    )
 
 # --- MAIN PANEL ROUTING ---
 
-# 1. HOME TAB
-if nav_selection == "🏠 Home":
+# === VIRALITY OS TABS ===
+if nav_selection == "🏠 Home Dashboard":
     st.title("🏠 Virality Dashboard - Home")
     st.write("Welcome back, Ashwamegh! System is active and running.")
     
@@ -73,7 +79,6 @@ if nav_selection == "🏠 Home":
     })
     st.table(keywords_df)
 
-# 2. SCRIPT STUDIO
 elif nav_selection == "📄 Script Studio":
     st.title("📄 15-Second Viral Script Engine")
     st.write("Generate high-converting scripts based on Nawaz's HPPC Framework (Hook, Proof, Process, CTA).")
@@ -91,8 +96,7 @@ elif nav_selection == "📄 Script Studio":
         else:
             st.error("Please fill out both fields first!")
 
-# 3. LIKED REELS
-elif nav_selection == "❤️ Liked Reels":
+elif nav_selection == "❤️ Liked Reels Vault":
     st.title("❤️ Saved Viral Reels Vault")
     st.write("Save and monitor viral reels links in one workspace.")
     
@@ -106,8 +110,7 @@ elif nav_selection == "❤️ Liked Reels":
     st.markdown("### 📋 Saved Vault Content")
     st.dataframe(pd.DataFrame(st.session_state.liked_reels), use_container_width=True)
 
-# 4. COMPETITORS
-elif nav_selection == "👥 Competitors":
+elif nav_selection == "👥 Competitors Board":
     st.title("👥 Competitor Watch Board")
     st.write("Monitor top niche creators and reverse-engineer their viral hooks.")
     
@@ -118,8 +121,7 @@ elif nav_selection == "👥 Competitors":
     })
     st.dataframe(comp_df, use_container_width=True)
 
-# 5. ANALYTICS
-elif nav_selection == "📊 Analytics":
+elif nav_selection == "📊 Content Analytics":
     st.title("📊 Virality Analytics Dashboard")
     st.write("Visual growth track and organic response evaluation.")
     
@@ -129,8 +131,7 @@ elif nav_selection == "📊 Analytics":
     })
     st.line_chart(chart_data.set_index('Days'))
 
-# 6. CALENDAR
-elif nav_selection == "📅 Calendar":
+elif nav_selection == "📅 Posting Calendar":
     st.title("📅 Content Posting Calendar")
     st.write("Plan your digital marketing campaigns & reselling videos schedule.")
     
@@ -147,7 +148,6 @@ elif nav_selection == "📅 Calendar":
     st.markdown("### 🗓️ Upcoming Schedule")
     st.table(pd.DataFrame(st.session_state.calendar_events))
 
-# 7. AI HOOKS STUDIO
 elif nav_selection == "✍️ AI Hooks Studio":
     st.title("✍️ AI Hooks & Idea Studio")
     st.write("Instantly generate 3 extreme viral hooks for your software promos.")
@@ -159,7 +159,6 @@ elif nav_selection == "✍️ AI Hooks Studio":
         st.info("💸 **Hook 2 (Result First):** How I extracted 500+ premium B2B client numbers without spending a single rupee.")
         st.info("🚨 **Hook 3 (Negative Psychology):** Don't launch your digital product store until you use this undercover software.")
 
-# 8. AI EDITOR HELPER
 elif nav_selection == "🎬 AI Editor Helper":
     st.title("🎬 AI Video Editor Assist")
     st.write("Editing strategies, asset notes, and sound hacks to bypass the algorithm.")
@@ -170,7 +169,6 @@ elif nav_selection == "🎬 AI Editor Helper":
     3. **Pacing:** Cut out any gaps. Keep the video tight and fast-paced.
     """)
 
-# 9. PROFILE PANEL
 elif nav_selection == "👤 Profile Panel":
     st.title("👤 Founder Executive Profile")
     st.markdown("### Ashwamegh Patil")
@@ -180,9 +178,10 @@ elif nav_selection == "👤 Profile Panel":
     st.write("**Primary Contact 2:** 8055446945")
     st.write("**Focus Portfolio:** SaaS Tools Reselling, Professional Lead Generation & CRM Automation.")
 
-# 10. COMMERCE OS (LEADS DATABASE)
-elif nav_selection == "🛒 Commerce OS":
-    st.title("🛒 Live Sales & B2B Leads Tracker")
+
+# === COMMERCE OS TABS ===
+elif nav_selection == "📊 Sales Dashboard & Live Leads":
+    st.title("📊 Live Sales & B2B Leads Database Tracker")
     st.write("This data is synced directly with your Google Sheet `ASP_ViralX_Database`.")
     
     if sheet:
@@ -191,23 +190,34 @@ elif nav_selection == "🛒 Commerce OS":
             if data:
                 st.dataframe(data, use_container_width=True)
             else:
-                st.info("Database sheet is currently empty. Add some test data!")
+                st.info("Database sheet is currently empty. Add some leads from the next tab!")
         except Exception as e:
             st.error("Error fetching data from Google Sheets.")
     else:
         st.warning("Google Sheet setup is pending. Please configure secrets in Streamlit Cloud.")
-        
-    st.subheader("➕ Add New Lead Manually")
+
+elif nav_selection == "➕ Add New Lead Entry":
+    st.title("➕ Add New Lead Flow")
+    st.write("Fill details to instantly append data into Google Sheets backend database.")
+    
+    if not sheet:
+        st.warning("Google Sheet not connected.")
+    
     with st.form("lead_form", clear_on_submit=True):
         c_name = st.text_input("Customer Name")
         c_whatsapp = st.text_input("WhatsApp Number")
         c_email = st.text_input("Email ID")
-        c_product = st.selectbox("Product", ["Canva Pro", "WaSender Tool", "Google Map Scraper", "Digital Bundle"])
+        c_product = st.selectbox("Product Issued", ["Canva Pro", "WaSender Tool", "Google Map Scraper", "Digital Bundle"])
         c_status = st.selectbox("Payment Status", ["Paid", "Pending"])
         
-        submit = st.form_submit_button("Save Lead")
+        submit = st.form_submit_button("Save Lead to Sheet")
         if submit and sheet:
             today = str(datetime.date.today())
             sheet.append_row([today, c_name, c_whatsapp, c_email, c_product, c_status])
-            st.success("Lead added successfully!")
-            st.rerun()
+            st.success(f"Success! {c_name}'s data written into Google Sheet.")
+
+elif nav_selection == "📈 Revenue Analytics":
+    st.title("📈 Commerce Revenue Dashboard")
+    st.write("Track sales conversion graphs and B2B growth metrics.")
+    st.metric("Total Generated Revenue Estimation", "₹50,000", "Target Monthly Reach")
+    st.info("Keep driving traffic from AI Hooks Studio to grow this metric!")
