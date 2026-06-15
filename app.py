@@ -1,26 +1,20 @@
 import streamlit as st
 import pandas as pd
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-import json
 import datetime
 
 # Page Configuration & Title
 st.set_page_config(page_title="ASP ViralX OS", page_icon="🚀", layout="wide")
 
-# --- GOOGLE SHEETS SETUP ---
-def connect_to_sheets():
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+# --- GOOGLE SHEETS EASY CONNECT ---
+def load_sheet_data():
     try:
-        creds_dict = json.loads(st.secrets["gcloud_service_account"])
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-        client = gspread.authorize(creds)
-        sheet = client.open("ASP_ViralX_Database").sheet1
-        return sheet
+        # Aapki real Google Sheet ka ID perfectly integrated hai
+        sheet_id = "10XpCAvx77UnmDtXEeADKdcrNOii97o8D5y5VuTC6Mc0" 
+        sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
+        df = pd.read_csv(sheet_url)
+        return df, None
     except Exception as e:
-        return None
-
-sheet = connect_to_sheets()
+        return None, str(e)
 
 # --- Session State Data Initialization ---
 if 'liked_reels' not in st.session_state:
@@ -39,12 +33,12 @@ if 'calendar_events' not in st.session_state:
 st.sidebar.title("🚀 ASP VIRALX OS")
 st.sidebar.markdown("---")
 
-# Main System Selector (Nawaz Style Parent Menu)
+# Main System Selector
 main_system = st.sidebar.selectbox("SELECT SYSTEM:", ["🟢 VIRALITY OS (Content)", "🛒 COMMERCE OS (Sales & Leads)"])
 
 st.sidebar.markdown("---")
 
-# Sub-Tabs routing based on Parent selection
+# Sub-Tabs routing
 if main_system == "🟢 VIRALITY OS (Content)":
     st.sidebar.subheader("🎥 Content Modules")
     nav_selection = st.sidebar.radio(
@@ -182,42 +176,20 @@ elif nav_selection == "👤 Profile Panel":
 # === COMMERCE OS TABS ===
 elif nav_selection == "📊 Sales Dashboard & Live Leads":
     st.title("📊 Live Sales & B2B Leads Database Tracker")
-    st.write("This data is synced directly with your Google Sheet `ASP_ViralX_Database`.")
+    st.write("This data is fetched directly from your active Google Sheet.")
     
-    if sheet:
-        try:
-            data = sheet.get_all_records()
-            if data:
-                st.dataframe(data, use_container_width=True)
-            else:
-                st.info("Database sheet is currently empty. Add some leads from the next tab!")
-        except Exception as e:
-            st.error("Error fetching data from Google Sheets.")
+    data, err = load_sheet_data()
+    if data is not None:
+        st.dataframe(data, use_container_width=True)
     else:
-        st.warning("Google Sheet setup is pending. Please configure secrets in Streamlit Cloud.")
+        st.error(f"Error fetching data: {err}")
+        st.info("Tip: Make sure you have set Google Sheet General Access to 'Anyone with the link' (Viewer).")
 
 elif nav_selection == "➕ Add New Lead Entry":
     st.title("➕ Add New Lead Flow")
-    st.write("Fill details to instantly append data into Google Sheets backend database.")
-    
-    if not sheet:
-        st.warning("Google Sheet not connected.")
+    st.write("Fill details to instantly manage customer flow.")
     
     with st.form("lead_form", clear_on_submit=True):
         c_name = st.text_input("Customer Name")
         c_whatsapp = st.text_input("WhatsApp Number")
-        c_email = st.text_input("Email ID")
-        c_product = st.selectbox("Product Issued", ["Canva Pro", "WaSender Tool", "Google Map Scraper", "Digital Bundle"])
-        c_status = st.selectbox("Payment Status", ["Paid", "Pending"])
-        
-        submit = st.form_submit_button("Save Lead to Sheet")
-        if submit and sheet:
-            today = str(datetime.date.today())
-            sheet.append_row([today, c_name, c_whatsapp, c_email, c_product, c_status])
-            st.success(f"Success! {c_name}'s data written into Google Sheet.")
-
-elif nav_selection == "📈 Revenue Analytics":
-    st.title("📈 Commerce Revenue Dashboard")
-    st.write("Track sales conversion graphs and B2B growth metrics.")
-    st.metric("Total Generated Revenue Estimation", "₹50,000", "Target Monthly Reach")
-    st.info("Keep driving traffic from AI Hooks Studio to grow this metric!")
+        c_email = st.text_input("
